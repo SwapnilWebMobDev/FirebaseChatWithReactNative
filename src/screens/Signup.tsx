@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import ScreenWrapper from '../components/screenWrapper';
 import { useNavigation } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
@@ -11,6 +11,7 @@ const Signup = () => {
     const [mobile, setMobile] = useState('');
     const [password, setPasssword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const generateUniqueId = () => {
         const now = new Date();
@@ -23,6 +24,7 @@ const Signup = () => {
         return `${year}${month}${date}${hours}${minutes}${seconds}`;
     };
     const registerUser = () => {
+        setLoading(true);
         const userId = generateUniqueId();
         firestore().collection('users').doc(userId).set({
             name: name,
@@ -30,26 +32,66 @@ const Signup = () => {
             mobile: mobile,
             password: password,
             userId: userId,
-        }).then((response) => console.log('Response from firebase:', response)).catch((error) => console.log('Error from firebase:', error))
+        }).then((response) => {
+            setName('');
+            setEmail('');
+            setMobile('');
+            setPasssword('');
+            setConfirmPassword('');
+            setTimeout(() => {
+                setLoading(false);
+                Alert.alert(
+                    'Success',
+                    'Signed up successfully',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () => navigation.navigate('Login'), // Replace 'Login' with your login screen route name
+                        },
+                    ],
+                    { cancelable: false }
+                );
+            }, 2000);
+
+        }
+        ).catch((error) => console.log('Error from firebase:', error))
     };
+    const validateInput = () => {
+        let isValid = true;
+        if (name === '' || email === '' || password === '' || confirmPassword === '') {
+            isValid = false;
+        }
+        if (password !== confirmPassword) {
+            isValid = false;
+        }
+        return isValid;
+    }
     return (
         <ScreenWrapper>
-            <View style={styles.container}>
-                <Text style={styles.title}>Sign Up</Text>
-                <TextInput placeholder="Enter  Name" placeholderTextColor="black" style={[styles.input, { marginTop: 20 }]} value={name} onChangeText={setName} />
-                <TextInput placeholder="Enter Email" placeholderTextColor="black" style={[styles.input, { marginTop: 20 }]} value={email} onChangeText={setEmail} />
-                <TextInput placeholder="Enter Mobile Number" placeholderTextColor="black" style={[styles.input, { marginTop: 20 }]} keyboardType={'number-pad'} value={mobile} onChangeText={setMobile} />
-                <TextInput placeholder="Enter Password" placeholderTextColor="black" style={[styles.input, { marginTop: 20 }]} value={password} onChangeText={setPasssword} />
-                <TextInput placeholder="Confirm Password" placeholderTextColor="black" style={[styles.input, { marginTop: 20 }]} value={confirmPassword} onChangeText={setConfirmPassword} />
-                <TouchableOpacity style={styles.btn} onPress={() => {
-                    registerUser();
-                }}>
-                    <Text style={styles.btnText}>Sign up</Text>
-                </TouchableOpacity>
-                <Text style={styles.orLogin} onPress={() => {
-                    navigation.navigate('Login')
-                }} >Or Login</Text>
-            </View>
+            {
+                loading ? <ActivityIndicator size="large" color="purple" /> :
+                    <View style={styles.container}>
+                        <Text style={styles.title}>Sign Up</Text>
+                        <TextInput placeholder="Enter  Name" placeholderTextColor="black" style={[styles.input, { marginTop: 20 }]} value={name} onChangeText={setName} />
+                        <TextInput placeholder="Enter Email" placeholderTextColor="black" style={[styles.input, { marginTop: 20 }]} value={email} onChangeText={setEmail} />
+                        <TextInput placeholder="Enter Mobile Number" placeholderTextColor="black" style={[styles.input, { marginTop: 20 }]} keyboardType={'number-pad'} value={mobile} onChangeText={setMobile} />
+                        <TextInput placeholder="Enter Password" placeholderTextColor="black" style={[styles.input, { marginTop: 20 }]} value={password} onChangeText={setPasssword} />
+                        <TextInput placeholder="Confirm Password" placeholderTextColor="black" style={[styles.input, { marginTop: 20 }]} value={confirmPassword} onChangeText={setConfirmPassword} />
+                        <TouchableOpacity style={styles.btn} onPress={() => {
+                            if (validateInput()) {
+                                registerUser();
+                            } else {
+                                Alert.alert('Please enter valid details.');
+                            }
+                        }}>
+                            <Text style={styles.btnText}>Sign up</Text>
+                        </TouchableOpacity>
+                        <Text style={styles.orLogin} onPress={() => {
+                            navigation.navigate('Login')
+                        }} >Or Login</Text>
+                    </View>
+            }
+
         </ScreenWrapper>
 
     );
