@@ -3,28 +3,22 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-nativ
 import ScreenWrapper from '../components/screenWrapper';
 import { useNavigation } from '@react-navigation/native';
 
-const Signup = () => {
+const Login = () => {
     const navigation = useNavigation();
-    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
-    const [mobile, setMobile] = useState('');
     const [password,setPasssword ] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
     return (
         <ScreenWrapper>
             <View style={styles.container}>
-                <Text style={styles.title}>Sign Up</Text>
-                <TextInput placeholder="Enter  Name" placeholderTextColor="black" style={[styles.input, { marginTop: 20 }]} value={name} onChangeText={setName}/>
+                <Text style={styles.title}>Login</Text>
                 <TextInput placeholder="Enter Email" placeholderTextColor="black" style={[styles.input, { marginTop: 20 }]} value={email} onChangeText={setEmail}/>
-                <TextInput placeholder="Enter Mobile Number" placeholderTextColor="black" style={[styles.input, { marginTop: 20 }]} keyboardType={'number-pad'} value={mobile} onChangeText={setMobile}/>
                 <TextInput placeholder="Enter Password" placeholderTextColor="black" style={[styles.input, { marginTop: 20 }]} value={password} onChangeText={setPasssword}/>
-                <TextInput placeholder="Confirm Password" placeholderTextColor="black" style={[styles.input, { marginTop: 20 }]} value={confirmPassword} onChangeText={setConfirmPassword}/>
                 <TouchableOpacity style={styles.btn}>
                     <Text style={styles.btnText}>Sign up</Text>
                 </TouchableOpacity>
                 <Text style={styles.orLogin} onPress={() => {
-                    navigation.navigate('Login')
-                }} >Or Login</Text>
+                    navigation.navigate('Signup')
+                }} >Or Sign Up</Text>
             </View>
         </ScreenWrapper>
 
@@ -72,4 +66,4 @@ const styles = StyleSheet.create({
         textDecorationLine: 'underline',
     },
 });
-export default Signup;
+export default Login;
